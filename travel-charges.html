@@ -35,8 +35,9 @@
 .field input::placeholder{color:var(--line);letter-spacing:.14em}
 .field input:focus{outline:3px solid var(--water);outline-offset:2px}
 .hint{font-size:.95rem;color:var(--steel);margin:10px 0 0}
+.combo{position:relative}
 .sugg{
-  list-style:none;margin:0;padding:0;position:absolute;z-index:20;left:0;right:0;
+  list-style:none;margin:0;padding:0;position:absolute;z-index:20;top:100%;left:0;right:0;
   background:var(--white);border:2px solid var(--ink);border-top:0;max-height:260px;overflow:auto;
 }
 .sugg:empty{display:none}
@@ -174,9 +175,11 @@
   <div class="wrap">
     <div class="field">
       <label for="zip">Job site ZIP code or city</label>
-      <input id="zip" type="text" inputmode="numeric" autocomplete="postal-code"
-             placeholder="43240" aria-describedby="hint" aria-autocomplete="list">
-      <ul class="sugg" id="sugg" role="listbox" aria-label="Matching locations"></ul>
+      <div class="combo">
+        <input id="zip" type="text" inputmode="numeric" autocomplete="postal-code"
+               placeholder="43240" aria-describedby="hint" aria-autocomplete="list">
+        <ul class="sugg" id="sugg" role="listbox" aria-label="Matching locations"></ul>
+      </div>
       <p class="hint" id="hint">Five digits, or start typing a city name.</p>
     </div>
 
