@@ -19,7 +19,7 @@ var CLARITY_ID = "PASTE-CLARITY-ID-HERE";  /* looks like: q7f2mk9xyz     */
 (function () {
   "use strict";
 
-  var gaReady = GA4_ID && GA4_ID !== "PASTE-GA4-ID-HERE";
+  var gaReady = GA4_ID && GA4_ID !== "G-XD0KG85H8V";
   var clReady = CLARITY_ID && CLARITY_ID !== "PASTE-CLARITY-ID-HERE";
 
   /* ---------------------------------------------------- Google Analytics 4 */
