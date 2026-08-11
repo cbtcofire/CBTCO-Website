@@ -9,7 +9,7 @@
    tracked — so this file is safe to deploy right now.
    ========================================================================== */
 
-var GA4_ID     = "G-XD0KG85H8V";      /* looks like: G-ABC1234XYZ   */
+var GA4_ID     = "PASTE-GA4-ID-HERE";      /* looks like: G-ABC1234XYZ   */
 var CLARITY_ID = "PASTE-CLARITY-ID-HERE";  /* looks like: q7f2mk9xyz     */
 
 /* ==========================================================================
@@ -19,7 +19,7 @@ var CLARITY_ID = "PASTE-CLARITY-ID-HERE";  /* looks like: q7f2mk9xyz     */
 (function () {
   "use strict";
 
-  var gaReady = GA4_ID && GA4_ID !== "G-XD0KG85H8V";
+  var gaReady = GA4_ID && GA4_ID !== "PASTE-GA4-ID-HERE";
   var clReady = CLARITY_ID && CLARITY_ID !== "PASTE-CLARITY-ID-HERE";
 
   /* ---------------------------------------------------- Google Analytics 4 */
