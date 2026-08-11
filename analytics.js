@@ -10,7 +10,7 @@
    ========================================================================== */
 
 var GA4_ID     = "G-XD0KG85H8V";      /* looks like: G-ABC1234XYZ   */
-var CLARITY_ID = "PASTE-CLARITY-ID-HERE";  /* looks like: q7f2mk9xyz     */
+var CLARITY_ID = "y0rsmjotqk";  /* looks like: q7f2mk9xyz     */
 
 /* ==========================================================================
    No changes needed below this line.
