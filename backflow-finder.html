@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backflow Finder | CBTCO Fire &amp; Safety — Columbus, OH</title>
+<meta name="description" content="Search every backflow assembly on the City of Columbus device list by address, serial number, or hazard ID. From Columbus Backflow Testing Company &amp; Fire.">
+<link rel="canonical" href="https://columbusbackflowtestingcompany.com/backflow-finder">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=3">
+<script src="/analytics.js" defer></script>
+<style>
+/* Backflow Finder components (site chrome comes from styles.css). Scoped to #bf. */
+#bf{--water-tint:#e4eef6;--mark:#cfe1ef;--line-soft:#eceadf;--on-ink-muted:#93a3b1;--ghost-border:#6c7a87;--ink-footer:#0f1821;
+  --font-display:"Barlow Condensed","Arial Narrow",sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,monospace}
+.bf-stamp{margin-top:18px;font-family:var(--font-mono);font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:#93a3b1}
+.bf-stamp b{color:var(--white);font-weight:500}
+#bf .searchbar{background:var(--ink-2);border-bottom:1px solid var(--ink-footer);padding-block:16px}
+#bf .search{position:relative}
+#bf .search input{width:100%;font:inherit;font-size:1.1rem;padding:13px 46px 13px 16px;border:2px solid var(--white);border-radius:0;background:var(--white);color:var(--ink)}
+#bf .search input::placeholder{color:var(--steel)}
+#bf .search input:focus{outline:none;border-color:var(--water);box-shadow:inset 0 0 0 1px var(--water)}
+#bf .clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--steel);font-size:24px;line-height:1;cursor:pointer;padding:6px 10px;border-radius:0}
+#bf .clear:hover{color:var(--ink)}
+#bf .filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+#bf .filters .lbl{color:var(--on-ink-muted);margin-right:4px;font-family:var(--font-mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase}
+#bf .chipbtn{font-family:var(--font-display);font-weight:600;font-size:.95rem;letter-spacing:.05em;text-transform:uppercase;border:2px solid var(--ghost-border);background:transparent;color:var(--white);padding:4px 12px;border-radius:0;cursor:pointer}
+#bf .chipbtn:hover{border-color:var(--white)}
+#bf .chipbtn[aria-pressed="true"]{background:var(--water);border-color:var(--water)}
+#bf .mono-label{font-family:var(--font-mono);font-size:.7rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+#bf .results{padding-block:28px 56px}
+#bf .summary{color:var(--ink-2);font-size:.95rem;margin-bottom:14px;font-variant-numeric:tabular-nums}
+#bf .summary b{color:var(--ink)}
+#bf .list{display:flex;flex-direction:column;gap:14px}
+#bf .site{background:var(--white);border:1px solid var(--line);border-top:6px solid var(--water)}
+#bf .site>button{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:1fr auto;gap:6px 18px;padding:16px 20px;cursor:pointer}
+#bf .site>button:hover{background:var(--water-tint)}
+#bf .site>button:focus-visible{outline:3px solid var(--water);outline-offset:-3px}
+#bf .addr{font-family:var(--font-display);font-weight:600;font-size:1.45rem;line-height:1.15;text-transform:uppercase;min-width:0;color:var(--ink)}
+#bf .addr .zip{font-family:var(--font-mono);font-weight:400;font-size:.8rem;letter-spacing:.06em;color:var(--steel);margin-left:8px;vertical-align:2px}
+#bf .count{text-align:right;white-space:nowrap}
+#bf .count b{display:block;font-family:var(--font-display);font-weight:700;font-size:1.6rem;line-height:1;color:var(--water-dark);font-variant-numeric:tabular-nums}
+#bf .count span{color:var(--steel)}
+#bf .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;grid-column:1/-1}
+#bf .tag{font-family:var(--font-mono);font-size:.72rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border:1px solid var(--line);color:var(--ink-2);background:var(--white);font-variant-numeric:tabular-nums}
+#bf .tag.act{border-color:var(--water);color:var(--water-dark)}
+#bf .why{width:100%;font-size:.88rem;color:var(--ink-2)}
+#bf mark{background:var(--mark);color:inherit;padding:0 1px}
+#bf .devwrap{border-top:1px solid var(--line);overflow-x:auto}
+#bf table.dev{width:100%;border-collapse:collapse;font-size:.95rem;font-variant-numeric:tabular-nums}
+#bf .dev th{text-align:left;font-family:var(--font-mono);font-size:.7rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--white);background:var(--ink);padding:9px 12px;white-space:nowrap}
+#bf .dev td{padding:9px 12px;border-top:1px solid var(--line-soft);vertical-align:top}
+#bf .dev tr.hit td{background:var(--water-tint)}
+#bf .mono{font-family:var(--font-mono);font-size:.85rem;letter-spacing:0;text-transform:none;white-space:nowrap}
+#bf .st{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-weight:600;color:var(--ink)}
+#bf .st i{width:10px;height:10px;display:inline-block;flex:none;background:var(--steel)}
+#bf .st.s-Active i{background:var(--water)}
+#bf .st.s-LPS i{background:var(--water-dark);outline:2px solid var(--mark)}
+#bf .st.s-Not{color:var(--steel);font-weight:400} #bf .st.s-Not i{background:transparent;border:2px solid var(--steel)}
+#bf .st.s-Inactive{color:var(--steel);font-weight:400} #bf .st.s-Inactive i{background:var(--line)}
+#bf .ty{font-family:var(--font-display);font-weight:700;font-size:1.1rem;letter-spacing:.03em}
+#bf .copy{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);background:var(--white);color:var(--steel);border-radius:0;padding:1px 6px;margin-left:6px;cursor:pointer;vertical-align:1px}
+#bf .copy:hover{color:var(--water-dark);border-color:var(--water)}
+#bf .dash{color:var(--line)}
+#bf .more{display:block;margin:20px auto 0;font-family:var(--font-display);font-weight:600;font-size:1.05rem;letter-spacing:.05em;text-transform:uppercase;padding:11px 22px;border:2px solid var(--water);background:var(--white);color:var(--water-dark);border-radius:0;cursor:pointer}
+#bf .more:hover{background:var(--water);color:var(--white)}
+#bf .more[hidden]{display:none}
+#bf .empty-state{background:var(--white);border:1px solid var(--line);border-left:6px solid var(--water);padding:20px 24px;color:var(--ink-2)}
+#bf .empty-state b{font-family:var(--font-display);font-weight:600;text-transform:uppercase;font-size:1.15rem;color:var(--ink);display:block;margin-bottom:4px}
+#bf .empty-state code{font-family:var(--font-mono);font-size:.85rem;background:var(--paper);border:1px solid var(--line);padding:0 5px}
+#bf .note{margin-top:36px;background:var(--white);border:1px solid var(--line);border-left:6px solid var(--steel);padding:18px 22px;font-size:.92rem;color:var(--ink-2)}
+#bf .note .eyebrow{display:block;margin-bottom:8px;color:var(--steel)}
+#bf .note ul{margin:6px 0 0;padding-left:18px}
+@media (max-width:640px){
+  #bf .searchbar{padding-block:12px}
+  #bf .search input{font-size:16px;padding:11px 44px 11px 12px}
+  #bf .filters{flex-wrap:nowrap;overflow-x:auto;margin-inline:-20px;padding-inline:20px;scrollbar-width:none;margin-top:8px}
+  #bf .filters::-webkit-scrollbar{display:none}
+  #bf .chipbtn{flex:none;padding:5px 12px}
+  #bf .results{padding-block:18px 40px}
+  #bf .summary{font-size:.88rem}
+  #bf .site>button{padding:14px}
+  #bf .addr{font-size:1.25rem}
+  #bf .addr .zip{display:block;margin:2px 0 0}
+  #bf .count b{font-size:1.4rem}
+  #bf .devwrap{overflow-x:visible}
+  #bf table.dev,#bf .dev tbody{display:block}
+  #bf .dev thead{display:none}
+  #bf .dev tr{display:grid;grid-template-columns:auto auto 1fr;grid-template-areas:"ty sz st" "se se se" "hz hz hz" "mk mk mk" "lo lo lo";gap:4px 10px;align-items:center;padding:14px;border-top:1px solid var(--line)}
+  #bf .dev tr.hit{background:var(--water-tint)} #bf .dev tr.hit td{background:none}
+  #bf .dev td{padding:0;border:0;min-width:0}
+  #bf .dev .c-ty{grid-area:ty} #bf .dev .c-ty .ty{font-size:1.3rem}
+  #bf .dev .c-sz{grid-area:sz;color:var(--steel);font-size:.95rem}
+  #bf .dev .c-st{grid-area:st;justify-self:end;font-size:.9rem}
+  #bf .dev .c-se{grid-area:se} #bf .dev .c-hz{grid-area:hz}
+  #bf .dev .c-se,#bf .dev .c-hz{display:flex;align-items:center;gap:6px;font-size:.95rem;white-space:normal;word-break:break-all}
+  #bf .dev .c-se::before,#bf .dev .c-hz::before{content:attr(data-l);font-family:var(--font-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--steel);width:78px;flex:none}
+  #bf .dev .c-mk{grid-area:mk;color:var(--steel);font-size:.9rem}
+  #bf .dev .c-lo{grid-area:lo;font-size:.95rem}
+  #bf .dev .c-lo .dash,#bf .dev .c-mk .dash{display:none}
+  #bf .copy{font-size:.7rem;padding:5px 10px;margin-left:auto}
+}
+@media (prefers-reduced-motion:no-preference){#bf .site>button{transition:background .12s}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <span>Mon–Fri 8 AM–4 PM · 24/7 Emergency Service</span>
+    <span>Call us: <a href="tel:+16146543569">614-654-FLOW (3569)</a></span>
+  </div>
+</div>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="/">
+      <img class="brand-logo" src="logo.png" alt="Columbus Backflow Testing Company &amp; Fire — home">
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="mainnav" onclick="var n=document.getElementById('mainnav');var o=n.classList.toggle('open');this.setAttribute('aria-expanded',o);">Menu</button>
+    <nav class="main" id="mainnav" aria-label="Main">
+      <a href="/">Home</a>
+      <div class="nav-item">
+        <a href="/services">Services<span class="caret" aria-hidden="true">▾</span></a>
+        <div class="dropdown">
+          <div class="dd-col water">
+            <span class="dd-head water">Backflow Prevention</span>
+            <a href="/backflow-testing">Annual Backflow Testing</a>
+            <a href="/backflow-repair">Backflow Repair &amp; Rebuild</a>
+            <a href="/backflow-installation">Installation &amp; Replacement</a>
+          </div>
+          <div class="dd-col fire">
+            <span class="dd-head fire">Fire Protection</span>
+            <a href="/fire-sprinklers">Fire Sprinklers</a>
+            <a href="/fire-alarms">Fire Alarms</a>
+            <a href="/fire-alarm-monitoring">Fire Alarm Monitoring</a>
+            <a href="/fire-extinguishers">Fire Extinguishers</a>
+            <a href="/kitchen-hood-suppression">Kitchen Hood Suppression</a>
+            <a href="/exit-emergency-lighting">Exit &amp; Emergency Lighting</a>
+            <a href="/fire-hydrants">Fire Hydrants</a>
+            <a href="/fire-pumps">Fire Pumps</a>
+            <a href="/fire-dampers">Fire &amp; Smoke Dampers</a>
+          </div>
+          <div class="dd-col ink">
+            <span class="dd-head ink">Programs</span>
+            <a href="/multi-site-programs">Multi-Site Programs</a>
+          </div>
+          <a class="dd-all" href="/services">View All Services</a>
+        </div>
+      </div>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      <a href="https://cbtcofire.inspectpoint.com/customers/sign_in" target="_blank" rel="noopener">Customer Portal</a>
+      <a href="/contact" class="cta">Request Service</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="page-hero">
+  <div class="wrap">
+    <a class="back-link" href="/backflow-testing">← Annual Backflow Testing</a><br>
+    <span class="eyebrow">Backflow Prevention · City of Columbus Device List</span>
+    <h1>Backflow Finder</h1>
+    <p class="lede">Every backflow assembly the City of Columbus has on file, grouped by property. Search an address, serial number, hazard ID or location note to see all the devices at a site.</p>
+    <p class="bf-stamp" id="stamp">Loading device list…</p>
+  </div>
+</section>
+
+<div id="bf">
+<div class="searchbar"><div class="wrap">
+  <div class="search">
+    <label for="q" style="position:absolute;left:-9999px">Search address, serial, or hazard ID</label>
+    <input id="q" type="text" enterkeyhint="search" autocomplete="off" spellcheck="false" placeholder="Address, serial #, hazard ID, or location">
+    <button class="clear" id="clr" type="button" aria-label="Clear search">×</button>
+  </div>
+  <div class="filters" role="group" aria-label="Device status">
+    <span class="lbl">Status</span>
+    <button class="chipbtn" data-f="all" aria-pressed="true" type="button">All</button>
+    <button class="chipbtn" data-f="Active" aria-pressed="false" type="button">Active</button>
+    <button class="chipbtn" data-f="LPS - Active" aria-pressed="false" type="button">LPS – Active</button>
+    <button class="chipbtn" data-f="Not Required" aria-pressed="false" type="button">Not Required</button>
+    <button class="chipbtn" data-f="Inactive" aria-pressed="false" type="button">Inactive</button>
+  </div>
+</div></div>
+
+<div class="results"><div class="wrap">
+  <div class="summary" id="sum" aria-live="polite"></div>
+  <div class="list" id="list"></div>
+  <button class="more" id="more" type="button" hidden>Show more sites</button>
+  <div class="note">
+    <span class="eyebrow">About this list</span>
+    Source: City of Columbus Division of Water backflow location list for approved testers. It is updated twice a year.
+    <ul>
+      <li>The house number comes from the meter or account address, so it may not match where the assembly physically sits.</li>
+      <li>Serial numbers are not unique across manufacturers. Use the hazard ID to confirm a device.</li>
+      <li>If device information is wrong, submit a correction on the Verify Site Profile screen when you file the test report.</li>
+    </ul>
+  </div>
+</div></div>
+</div>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2>Need these assemblies tested?</h2>
+    <a class="btn btn-fire" href="/contact">Request Service</a>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div>
+      <img class="foot-logo" src="logo-white.png" alt="" aria-hidden="true">
+      <h4>CBTCO Fire &amp; Safety</h4>
+      <p>Columbus Backflow Testing Company &amp; Fire<br>
+      1491 Polaris Parkway, Suite 177<br>
+      Columbus, Ohio 43240</p>
+      <p style="margin-top:10px;"><a href="tel:+16146543569">614-654-FLOW (3569)</a><br>
+      <a href="mailto:info@cbtcofire.com">info@cbtcofire.com</a></p>
+    </div>
+    <div>
+      <h4>Site</h4>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/services">Services</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/multi-site-programs">Multi-Site Programs</a></li>
+        <li><a href="/service-areas">Service Area</a></li>
+        <li><a href="https://cbtcofire.inspectpoint.com/customers/sign_in" target="_blank" rel="noopener">Customer Portal</a></li>
+        <li><a href="https://www.facebook.com/pages/category/Plumbing-Service/Columbus-Backflow-Testing-Company-Fire-100186911865681/" target="_blank" rel="noopener">Facebook</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Services</h4>
+      <ul>
+        <li><a href="/backflow-testing">Backflow Testing</a></li>
+        <li><a href="/backflow-repair">Backflow Repair</a></li>
+        <li><a href="/fire-sprinklers">Fire Sprinklers</a></li>
+        <li><a href="/fire-alarms">Fire Alarms</a></li>
+        <li><a href="/fire-extinguishers">Fire Extinguishers</a></li>
+        <li><a href="/services">All Services →</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap">
+    <p class="foot-legal">© 2026 Columbus Backflow Testing Company &amp; Fire · A Veteran &amp; Women Owned Business · Ohio Fire License #53.21.1017 · <a href="/privacy-policy">Privacy Policy</a> · <a href="/sms-terms">SMS Terms &amp; Conditions</a></p>
+  </div>
+</footer>
+
+<!-- Freshworks support widget -->
+<script>
+	window.fwSettings={
+	'widget_id':158000000336
+	};
+	!function(){if("function"!=typeof window.FreshworksWidget){var n=function(){n.q.push(arguments)};n.q=[],window.FreshworksWidget=n}}() 
+</script>
+<script type='text/javascript' src='https://widget.freshworks.com/widgets/158000000336.js' async defer></script>
+
+
+<script src="/backflow-data.js"></script>
+<script>
+// site: [num, street, zip5, devices[]]; device: [status, serial, make, model, type, size, hazardId, location]
+const norm = s => s.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+const compact = s => s.toLowerCase().replace(/[^a-z0-9]/g,'');
+const sites = window.BF_DATA.map((s,i)=>{
+  const addr = (s[0]?s[0]+' ':'')+s[1];
+  const devHay = s[3].map(d=>({n:norm([d[1],d[2],d[3],d[4],d[6],d[7]].join(' ')), c:compact(d[1])+' '+d[6]}));
+  return {i, num:s[0], street:s[1], zip:s[2], devs:s[3], addr, hay:norm(addr+' '+s[2]), devHay};
+});
+const total = sites.reduce((a,s)=>a+s.devs.length,0);
+document.getElementById('stamp').innerHTML = `<b>${total.toLocaleString()}</b> devices · <b>${sites.length.toLocaleString()}</b> sites · Columbus Division of Water list`;
+
+const $q=document.getElementById('q'), $list=document.getElementById('list'), $sum=document.getElementById('sum'), $more=document.getElementById('more');
+let filter='all', results=[], shown=0, open=new Set();
+const PAGE=60;
+try{const f=localStorage.getItem('bf-filter'); if(f) filter=f;}catch(e){}
+document.querySelectorAll('.chipbtn').forEach(b=>b.setAttribute('aria-pressed', b.dataset.f===filter));
+
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function hl(text, toks){
+  let t=esc(text||''); if(!toks.length||!text) return t;
+  const re=new RegExp('\\b('+toks.map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi');
+  return t.replace(re,'<mark>$1</mark>');
+}
+const ABBR={street:'st',avenue:'ave',road:'rd',drive:'dr',boulevard:'blvd',lane:'ln',court:'ct',place:'pl',parkway:'pkwy',north:'n',south:'s',east:'e',west:'w',highway:'hwy',circle:'cir',terrace:'ter'};
+
+function search(){
+  const raw=$q.value.trim();
+  const toks=norm(raw).split(' ').filter(Boolean).map(t=>ABBR[t]||t);
+  const ctoks=toks.map(t=>t); // for serial compact match
+  const rawC=compact(raw);
+  results=[];
+  if(!toks.length){ render(toks); return; }
+  for(const s of sites){
+    // each token must appear in the address or in some device field
+    let score=0, ok=true, addrAll=true;
+    const hitDevs=new Set();
+    for(const t of toks){
+      let found=false;
+      if((' '+s.hay+' ').includes(' '+t)) { found=true; score+= (t===compact(s.num))?30:10; } else addrAll=false;
+      s.devHay.forEach((d,j)=>{ if((' '+d.n).includes(' '+t)||(t.length>=4&&(d.n.includes(t)||d.c.includes(t)))){found=true; hitDevs.add(j);} });
+      if(!found){ok=false;break;}
+    }
+    if(!ok && rawC.length>=4){ // whole query as a serial with punctuation removed, e.g. "RI-2280" vs "ri2280"
+      s.devHay.forEach((d,j)=>{ if(d.c.includes(rawC)){ok=true; hitDevs.add(j);} });
+      if(ok) score=5;
+    }
+    if(!ok) continue;
+    if(addrAll) hitDevs.clear();
+    if(rawC.length>=4){ s.devHay.forEach((d,j)=>{ if(d.c.split(' ').includes(rawC)){score+=200; hitDevs.add(j);} }); }
+    const devIdx = s.devs.map((d,j)=>j).filter(j=>filter==='all'||s.devs[j][0]===filter);
+    if(!devIdx.length) continue;
+    if(s.hay.startsWith(toks.join(' '))) score+=50;
+    results.push({s, score, hitDevs});
+  }
+  results.sort((a,b)=>b.score-a.score || a.s.street.localeCompare(b.s.street) || (parseInt(a.s.num)||0)-(parseInt(b.s.num)||0));
+  if(results.length===1||(results.length&&results[0].score>=50&&!(results[1]&&results[1].score>=50))) open.add(results[0].s.i);
+  render(toks);
+}
+
+function statusClass(st){return 's-'+(st||'').split(' ')[0];}
+function devTable(s, hitDevs, toks){
+  const rank={'Active':0,'LPS - Active':1,'Not Required':2,'Inactive':3};
+  const rows=s.devs.map((d,j)=>({d,j})).filter(x=>filter==='all'||x.d[0]===filter).sort((a,b)=>(hitDevs.has(b.j)-hitDevs.has(a.j))||((rank[a.d[0]]??4)-(rank[b.d[0]]??4)));
+  return `<div class="devwrap"><table class="dev"><thead><tr><th>Status</th><th>Type</th><th>Size</th><th>Serial #</th><th>Hazard ID</th><th class="opt">Make / Model</th><th>Location</th></tr></thead><tbody>${
+    rows.map(({d,j})=>`<tr class="${hitDevs.has(j)&&hitDevs.size<s.devs.length?'hit':''}">
+      <td class="c-st"><span class="st ${statusClass(d[0])}"><i></i>${esc(d[0])}</span></td>
+      <td class="c-ty"><span class="ty">${hl(d[4],toks)||'<span class="dash">—</span>'}</span></td>
+      <td class="c-sz">${d[5]?esc(d[5])+'″':'<span class="dash">—</span>'}</td>
+      <td class="mono c-se" data-l="Serial">${d[1]?hl(d[1],toks)+`<button class="copy" type="button" data-c="${esc(d[1])}">copy</button>`:'<span class="dash">—</span>'}</td>
+      <td class="mono c-hz" data-l="Hazard ID">${d[6]?hl(d[6],toks)+`<button class="copy" type="button" data-c="${esc(d[6])}">copy</button>`:'—'}</td>
+      <td class="opt c-mk">${hl([d[2],d[3]].filter(Boolean).join(' '),toks)||'<span class="dash">—</span>'}</td>
+      <td class="c-lo">${hl(d[7],toks)||'<span class="dash">—</span>'}</td></tr>`).join('')
+  }</tbody></table></div>`;
+}
+function card(r,toks){
+  const s=r.s;
+  const devs=s.devs.filter(d=>filter==='all'||d[0]===filter);
+  const types={}; devs.forEach(d=>{const k=d[4]||'?'; types[k]=(types[k]||0)+1;});
+  const active=s.devs.filter(d=>d[0]==='Active'||d[0]==='LPS - Active').length;
+  const devMatches=[...r.hitDevs].map(j=>s.devs[j]);
+  let why='';
+  if(devMatches.length && devMatches.length<s.devs.length){
+    const d=devMatches[0];
+    why=`<span class="why">Matched ${devMatches.length>1?devMatches.length+' devices, e.g. ':''}${hl([d[1]&&('serial '+d[1]), d[6]&&('hazard '+d[6]), d[7]].filter(Boolean).join(' · '),toks)}</span>`;
+  }
+  const isOpen=open.has(s.i);
+  return `<div class="site" data-i="${s.i}"><button type="button" aria-expanded="${isOpen}">
+    <div class="addr">${hl(s.addr,toks)}<span class="zip">${hl(s.zip,toks)}</span></div>
+    <div class="count"><b>${devs.length}</b><span class="mono-label">${devs.length===1?'device':'devices'}</span></div>
+    <div class="meta">${Object.entries(types).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<span class="tag t">${esc(k)} ×${v}</span>`).join('')}
+      <span class="tag act">${active} active</span>${why}</div>
+  </button>${isOpen?devTable(s,r.hitDevs,toks):''}</div>`;
+}
+function render(toks){
+  shown=Math.min(PAGE,results.length);
+  if(!toks.length){
+    $sum.innerHTML='';
+    $list.innerHTML=`<div class="empty-state"><b>Type an address to see every backflow at that site.</b><br>Try a house number and street (<code>85 N Yearling</code>), a serial number (<code>RI-2280</code>), a hazard ID (<code>3624614</code>), or a location note (<code>boiler room</code>). Street suffixes and directions can be spelled out or abbreviated.</div>`;
+    $more.hidden=true; return;
+  }
+  const devCount=results.reduce((a,r)=>a+r.s.devs.filter(d=>filter==='all'||d[0]===filter).length,0);
+  $sum.innerHTML=results.length?`<b>${results.length.toLocaleString()}</b> ${results.length===1?'site':'sites'} · <b>${devCount.toLocaleString()}</b> devices${filter!=='all'?' · '+esc(filter)+' only':''}${results.length>1?' · tap a site to list its devices':''}`:'';
+  $list.innerHTML=results.length?results.slice(0,shown).map(r=>card(r,toks)).join(''):`<div class="empty-state"><b>No sites match “${esc($q.value.trim())}”.</b><br>Check the spelling, drop the street suffix, or search by house number and one street word. ${filter!=='all'?'The status filter is set to '+esc(filter)+'; switch to All to widen the search.':''}</div>`;
+  $more.hidden=shown>=results.length;
+  $more.textContent=`Show more sites (${(results.length-shown).toLocaleString()} left)`;
+}
+let tm; $q.addEventListener('input',()=>{clearTimeout(tm); open.clear(); tm=setTimeout(search,140);});
+document.getElementById('clr').onclick=()=>{$q.value='';open.clear();search();$q.focus();};
+$more.onclick=()=>{const toks=curToks(); const add=results.slice(shown,shown+PAGE); shown+=add.length; $list.insertAdjacentHTML('beforeend',add.map(r=>card(r,toks)).join('')); $more.hidden=shown>=results.length; $more.textContent=`Show more sites (${(results.length-shown).toLocaleString()} left)`;};
+function curToks(){return norm($q.value).split(' ').filter(Boolean).map(t=>ABBR[t]||t);}
+document.querySelectorAll('.chipbtn').forEach(b=>b.onclick=()=>{
+  filter=b.dataset.f; try{localStorage.setItem('bf-filter',filter);}catch(e){}
+  document.querySelectorAll('.chipbtn').forEach(x=>x.setAttribute('aria-pressed',x===b)); search();
+});
+$list.addEventListener('click',e=>{
+  const c=e.target.closest('.copy');
+  if(c){ const v=c.dataset.c; const done=()=>{c.textContent='copied';setTimeout(()=>c.textContent='copy',1200);};
+    try{navigator.clipboard.writeText(v).then(done,()=>{selectText(c.previousSibling);});}catch(err){selectText(c.previousSibling);} return; }
+  const btn=e.target.closest('.site>button'); if(!btn) return;
+  const el=btn.parentElement, i=+el.dataset.i, r=results.find(x=>x.s.i===i);
+  if(open.has(i)){open.delete(i); el.querySelector('.devwrap')?.remove(); btn.setAttribute('aria-expanded','false');}
+  else{open.add(i); el.insertAdjacentHTML('beforeend',devTable(r.s,r.hitDevs,curToks())); btn.setAttribute('aria-expanded','true');}
+});
+function selectText(node){try{const r=document.createRange();r.selectNodeContents(node.parentElement);const s=getSelection();s.removeAllRanges();s.addRange(r);}catch(e){}}
+search();
+</script>
+
+</body>
+</html>
